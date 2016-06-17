@@ -11,7 +11,7 @@ parser.add_argument('-n', '--get-instance-name', action='store_true', help='retu
 parser.add_argument('-id', '--get-instance-id', action='store_true', help='returns just ip addresses', default=False)
 parser.add_argument('-sg', '--get-security-group', action='store_true', help='returns just ip addresses', default=False)
 parser.add_argument('-v', '--verbose', action='store_true', help='returns just ip addresses', default=False)
-parser.add_argument('-r', '--region', action='store_true', help='region', default=None)
+parser.add_argument('-r', '--region', action='store', help='region', default=None)
 
 args = parser.parse_args()
 print args
@@ -37,11 +37,16 @@ for i in range(len(args.tags)) :
 
 print tag_filters
 
-client = boto3.client(
-   'ec2',
-   region_name=args.region_name
-)
+#setting the region is specified or using the default config if not
+if args.region is not None :
+   client = boto3.client(
+      'ec2',
+      region_name=args.region_name
+   )
+else : 
+   client = boto3.client('ec2')
 
+#making the request
 if args.describe_tags :
    response = client.describe_tags()
    print response
