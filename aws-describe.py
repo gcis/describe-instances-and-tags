@@ -11,7 +11,7 @@ parser.add_argument('-n', '--get-instance-name', action='store_true', help='retu
 parser.add_argument('-id', '--get-instance-id', action='store_true', help='returns just ip addresses', default=False)
 parser.add_argument('-sg', '--get-security-group', action='store_true', help='returns just ip addresses', default=False)
 parser.add_argument('-v', '--verbose', action='store_true', help='returns just ip addresses', default=False)
-parser.add_argument('-r', '--region', action='store_true', help='region', default=False)
+parser.add_argument('-r', '--region', action='store_true', help='region', default=None)
 
 args = parser.parse_args()
 print args
@@ -50,23 +50,5 @@ else :
       Filters = tag_filters
    )
 
-
-# inputfile = ''
-# outputfile = ''
-# try:
-#    opts, args = getopt.getopt(argv,"divt:o:",["describe-tags","ip-address","verbose","tag=","ofile="])
-# except getopt.GetoptError:
-#    print 'test.py -i <inputfile> -o <outputfile>'
-#    sys.exit(2)
-# for opt, arg in opts:
-#    if opt in ("-d", "--describe-tags"):
-#       print 'describe tags'
-#       sys.exit()
-#    elif opt in ("-i", "--ifile"):
-#       inputfile = arg
-#    elif opt in ("-o", "--ofile"):
-#       outputfile = arg
-# print 'Input file is "', inputfile
-# print 'Output file is "', outputfile
 
 
