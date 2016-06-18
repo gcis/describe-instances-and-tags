@@ -1,7 +1,6 @@
 from __future__ import print_function
 import boto3
 import sys, argparse, json, pprint
-import tabulate
 
 
 parser = argparse.ArgumentParser(description='Describe AWS Ec2 resources')
