@@ -1,2 +1,2 @@
 #AVAILABLE SOON...
-WORK IN PROGRESS
+WORK IN PROGRESS, the readme will be available soon
