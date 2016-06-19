@@ -13,6 +13,7 @@ parser.add_argument('-pub', '--get-public-ip', action='store_true', help='return
 parser.add_argument('-r', '--set-region', action='store', help='region', default=None)
 parser.add_argument('-j', '--json-raw-output', action='store_true', help='raw output in json', default=False)
 parser.add_argument('-mx', '--max-count', action='store', type=int, help='max number of instances to show', default=0)
+parser.add_argument('-div', '--divider', action='store', help='max number of instances to show', default=None)
 
 args = parser.parse_args()
 #assign args to variables
@@ -25,6 +26,7 @@ i_pip = args.get_public_ip
 region = args.set_region
 raw_json = args.json_raw_output
 max_count = args.max_count
+div = args.divider
 
 #bootstrap
 default_run = not(i_ip or i_name or i_id or i_pip)
@@ -62,13 +64,12 @@ for i in range(len(s_tags)) :
 
 #Print function for instances
 def print_instances(instances_to_print) :
-   div = ' | ' if param_count > 1 else ''
+   divider = div if div is not None else ' | '
+   divider = divider if param_count > 1 else ''
    print_range = max_count if max_count > 0 else len(instances_to_print)
    for i in range(print_range) :
       instance = instances_to_print[i]
-      if raw_json :
-         pprint.pprint(instance)
-         print('')
+      if raw_json : pprint.pprint(instance)
       else :
          instance_ip = ''
          instance_name = ''
@@ -81,13 +82,24 @@ def print_instances(instances_to_print) :
                   instance_name = curr_tag['Value']
                else :
                   instance_name = 'NO name'
-         if default_run or i_ip :
-            instance_ip = instance['PrivateIpAddress']
-         if default_run or i_id :
-            instance_id = instance['InstanceId']
-         if default_run or i_pip :
-            instance_pip = instance['PublicIpAddress']
-         print(instance_name, instance_id, instance_ip, instance_pip, sep=div)
+         if default_run or i_ip : instance_ip = instance['PrivateIpAddress']
+         if default_run or i_id : instance_id = instance['InstanceId']
+         if default_run or i_pip : instance_pip = instance['PublicIpAddress']
+         print(instance_name, instance_id, instance_ip, instance_pip, sep=divider)
+         print('-------------------------------------------------------------')
+
+#Print Function for tags
+def print_tags(tags_response) :
+   av_tags = []
+   for i in range(len(tags_response)) :
+      if tags_response[i]['Key'] not in av_tags :
+         av_tags.append(tags_response[i]['Key'])
+         print(tags_response[i]['Key'], '-->', end=' ')
+         for j in range(len(tags_response)) :
+            if tags_response[j]['Key'] == response['Tags'][i]['Key'] : 
+               print(tags_response[j]['Value'], end=' | ')
+         print('')
+         print('-------------------------------------------------------------')
 
 
 #setting the region is specified or using the default config if not
@@ -102,17 +114,8 @@ else :
 #making the request
 if d_tags :
    print('')
-   av_tags = []
    response = client.describe_tags()
-   for i in range(len(response['Tags'])) :
-      if response['Tags'][i]['Key'] not in av_tags :
-         av_tags.append(response['Tags'][i]['Key'])
-         print(response['Tags'][i]['Key'], '-->', end=' ')
-         for j in range(len(response['Tags'])) :
-            if response['Tags'][j]['Key'] == response['Tags'][i]['Key'] : 
-               print(response['Tags'][j]['Value'], end=' | ')
-         print('')
-         print('-------------------------------------------------------------')
+   print_tags(response['Tags'])
 else :
    if default_run : 
       print('')
