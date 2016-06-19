@@ -12,6 +12,7 @@ parser.add_argument('-id', '--get-instance-id', action='store_true', help='retur
 parser.add_argument('-pub', '--get-public-ip', action='store_true', help='returns public ip ', default=False)
 parser.add_argument('-r', '--set-region', action='store', help='region', default=None)
 parser.add_argument('-j', '--json-raw-output', action='store_true', help='raw output in json', default=False)
+parser.add_argument('-mx', '--max-count', action='store', type=int, help='max number of instances to show', default=0)
 
 args = parser.parse_args()
 #assign args to variables
@@ -23,8 +24,19 @@ i_id = args.get_instance_id
 i_pip = args.get_public_ip
 region = args.set_region
 raw_json = args.json_raw_output
+max_count = args.max_count
 
+#bootstrap
 default_run = not(i_ip or i_name or i_id or i_pip)
+instances_to_print = []
+def count_parameters() :
+   par = 0
+   if i_ip : par += 1
+   if i_name : par += 1
+   if i_id : par += 1
+   if i_pip : par += 1
+   return par
+param_count = count_parameters()
 
 #Lets check tags and build the array for the describe request
 tag_filters = []
@@ -46,6 +58,37 @@ for i in range(len(s_tags)) :
       tag_filters.insert(len(tag_filters), data) 
    else :
       print('Tags were not written in the right way, You must specify tag_name=tag_value')
+
+
+#Print function for instances
+def print_instances(instances_to_print) :
+   div = ' | ' if param_count > 1 else ''
+   print_range = max_count if max_count > 0 else len(instances_to_print)
+   for i in range(print_range) :
+      instance = instances_to_print[i]
+      if raw_json :
+         pprint.pprint(instance)
+         print('')
+      else :
+         instance_ip = ''
+         instance_name = ''
+         instance_id = ''
+         instance_pip = ''
+         if default_run or i_name :
+            for k in range(len(instance['Tags'])) :
+               curr_tag = instance['Tags'][k]
+               if curr_tag['Key'] == 'Name' : 
+                  instance_name = curr_tag['Value']
+               else :
+                  instance_name = 'NO name'
+         if default_run or i_ip :
+            instance_ip = instance['PrivateIpAddress']
+         if default_run or i_id :
+            instance_id = instance['InstanceId']
+         if default_run or i_pip :
+            instance_pip = instance['PublicIpAddress']
+         print(instance_name, instance_id, instance_ip, instance_pip, sep=div)
+
 
 #setting the region is specified or using the default config if not
 if region is not None :
@@ -80,45 +123,8 @@ else :
    for i in range(len(reservations)) :
       instances = reservations[i]['Instances']
       for j in range(len(instances)) :
-         instance = instances[j]
-         if raw_json :
-            pprint.pprint(instance)
-            print('')
-         else :
-            instance_ip = ''
-            instance_name = ''
-            instance_id = ''
-            instance_pip = ''
-            if default_run or i_name :
-               for k in range(len(instance['Tags'])) :
-                  curr_tag = instance['Tags'][k]
-                  if curr_tag['Key'] == 'Name' : 
-                     instance_name = curr_tag['Value']
-                  else :
-                     instance_name = 'NO name'
-               print(instance_name, end='')
-               if default_run : 
-                  print(' | ', end='')
-            if default_run or i_ip :
-               instance_ip = instance['PrivateIpAddress']
-               print(instance_ip, end='')
-               if default_run : 
-                  print(' | ', end='')
-            if default_run or i_id :
-               instance_id = instance['InstanceId']
-               print(instance_id, end='')
-               if default_run : 
-                  print(' | ', end='')
-            if default_run or i_pip :
-               instance_pip = instance['PublicIpAddress']
-               print(instance_pip, end='')
-               if default_run : 
-                  print(' | ', end='')
-            if default_run:
-               print('')
-               print('-----------------------------------------------------------------')           
-            if not default_run:
-               print('')
+         instances_to_print.insert(len(instances_to_print), instances[j])
+   print_instances(instances_to_print)
 
 
 
