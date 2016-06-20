@@ -1,0 +1,28 @@
+- hosts: all
+  
+  tasks: 
+  - name: install basic packages debian
+    become: yes
+    become_method: sudo
+    apt: name={{ item }} state=latest update_cache=yes
+    with_items:
+      - wget
+      - python
+      - python-pip
+    when: ansible_os_family == "Debian"
+
+  - name: install basic packages redhat
+    become: yes
+    become_method: sudo
+    yum: name={{ item }} state=latest update_cache=yes
+    with_items:
+      - wget
+      - python
+      - python-pip
+    when: ansible_os_family == "RedHat"
+
+  - name: install pip packages
+    become: yes
+    become_method: sudo
+    pip: name=boto3 version=latest
+
