@@ -24,5 +24,8 @@
   - name: install pip packages
     become: yes
     become_method: sudo
-    pip: name=boto3 version=latest
+    pip: name={{ item }}
+    with_items:
+      - awscli
+      - boto3
 
