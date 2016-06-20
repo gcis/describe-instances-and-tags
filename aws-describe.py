@@ -67,7 +67,7 @@ for i in range(len(s_tags)) :
 #Print function for instances
 def print_instances(instances_to_print) :
    divider = div if div is not None else ' | '
-   divider = divider if param_count > 1 else ''
+   divider = divider if param_count > 1 or default_run else ''
    print_range = max_count if max_count > 0 else len(instances_to_print)
    for i in range(print_range) :
       instance = instances_to_print[i]
@@ -87,7 +87,8 @@ def print_instances(instances_to_print) :
          if default_run or i_ip : instance_ip = instance['PrivateIpAddress']
          if default_run or i_id : instance_id = instance['InstanceId']
          if default_run or i_pip : instance_pip = instance['PublicIpAddress']
-         print(instance_name, instance_id, instance_ip, instance_pip, sep=divider, end=eol)
+         print(instance_name, instance_id, instance_ip, instance_pip, sep=divider, end='')
+         if (i + 1) < print_range : print('', end=eol)
          if default_run or param_count > 1 : print('-------------------------------------------------------------')
 
 #Print Function for tags
