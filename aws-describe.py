@@ -31,7 +31,6 @@ div = args.divider
 eol = args.end_of_line
 
 #bootstrap
-default_run = not(i_ip or i_name or i_id or i_pip)
 instances_to_print = []
 def count_parameters() :
    par = 0
@@ -73,11 +72,13 @@ def print_value(value) :
 
 def print_instances(instances_to_print) :
    print_range = max_count if max_count > 0 else len(instances_to_print)
+   if eol is None and max_count != 1 : 
+            print('-------------------------------------------------------------')
    for i in range(print_range) :
       instance = instances_to_print[i]
       if raw_json : pprint.pprint(instance)
       else :
-         if default_run or i_name :
+         if param_count == 0 or i_name :
             for k in range(len(instance['Tags'])) :
                curr_tag = instance['Tags'][k]
                if curr_tag['Key'] == 'Name' : 
@@ -85,13 +86,12 @@ def print_instances(instances_to_print) :
                   break
                else :
                   if (k + 1) == len(instance['Tags']) : print_value('NO name')
-         if default_run or i_id : print_value(instance['InstanceId'])
-         if default_run or i_ip : print_value(instance['PrivateIpAddress'])
-         if default_run or i_pip : print_value(instance['PublicIpAddress'])
-         if eol is None :
-            if default_run or param_count > 1 : 
-               print('', end='\n')
-               print('-------------------------------------------------------------')
+         if param_count == 0 or i_id : print_value(instance['InstanceId'])
+         if param_count == 0 or i_ip : print_value(instance['PrivateIpAddress'])
+         if param_count == 0 or i_pip : print_value(instance['PublicIpAddress'])
+         if eol is None and max_count != 1 : 
+            print('', end='\n')
+            print('-------------------------------------------------------------')
          else :
             print('', end=eol)
 
@@ -124,8 +124,6 @@ if d_tags :
    response = client.describe_tags()
    print_tags(response['Tags'])
 else :
-   if default_run : 
-      print('')
    response = client.describe_instances(
       Filters = tag_filters
    )
