@@ -14,7 +14,7 @@ parser.add_argument('-r', '--set-region', action='store', help='region', default
 parser.add_argument('-j', '--json-raw-output', action='store_true', help='raw output in json', default=False)
 parser.add_argument('-mx', '--max-count', action='store', type=int, help='max number of instances to show', default=0)
 parser.add_argument('-div', '--divider', action='store', help='character that divides values', default=None)
-parser.add_argument('-e', '--end-of-line', action='store', help='character that divides values', default='\n')
+parser.add_argument('-e', '--end-of-line', action='store', help='character that divides the instances', default='\n')
 
 args = parser.parse_args()
 #assign args to variables
