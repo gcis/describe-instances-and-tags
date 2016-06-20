@@ -76,7 +76,9 @@ def print_instances(instances_to_print) :
             print('-------------------------------------------------------------')
    for i in range(print_range) :
       instance = instances_to_print[i]
-      if raw_json : pprint.pprint(instance)
+      if raw_json : 
+         pprint.pprint(instance)
+         print('-------------------------------------------------------------')
       else :
          if param_count == 0 or i_name :
             for k in range(len(instance['Tags'])) :
