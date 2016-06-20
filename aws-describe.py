@@ -14,7 +14,7 @@ parser.add_argument('-r', '--set-region', action='store', help='region', default
 parser.add_argument('-j', '--json-raw-output', action='store_true', help='raw output in json', default=False)
 parser.add_argument('-mx', '--max-count', action='store', type=int, help='max number of instances to show', default=0)
 parser.add_argument('-div', '--divider', action='store', help='character that divides values', default=None)
-parser.add_argument('-e', '--end-of-line', action='store', help='character that divides the instances', default='\n')
+parser.add_argument('-e', '--end-of-line', action='store', help='character that divides the instances', default=None)
 
 args = parser.parse_args()
 #assign args to variables
@@ -65,31 +65,35 @@ for i in range(len(s_tags)) :
 
 
 #Print function for instances
-def print_instances(instances_to_print) :
+def print_value(value) :
    divider = div if div is not None else ' | '
-   divider = divider if param_count > 1 or default_run else ''
+   if param_count == 1 : divider = '' 
+   print(value, end=divider)
+
+
+def print_instances(instances_to_print) :
    print_range = max_count if max_count > 0 else len(instances_to_print)
    for i in range(print_range) :
       instance = instances_to_print[i]
       if raw_json : pprint.pprint(instance)
       else :
-         instance_ip = ''
-         instance_name = ''
-         instance_id = ''
-         instance_pip = ''
          if default_run or i_name :
             for k in range(len(instance['Tags'])) :
                curr_tag = instance['Tags'][k]
                if curr_tag['Key'] == 'Name' : 
-                  instance_name = curr_tag['Value']
+                  print_value(curr_tag['Value'])
+                  break
                else :
-                  instance_name = 'NO name'
-         if default_run or i_ip : instance_ip = instance['PrivateIpAddress']
-         if default_run or i_id : instance_id = instance['InstanceId']
-         if default_run or i_pip : instance_pip = instance['PublicIpAddress']
-         print(instance_name, instance_id, instance_ip, instance_pip, sep=divider, end='')
-         if (i + 1) < print_range : print('', end=eol)
-         if default_run or param_count > 1 : print('-------------------------------------------------------------')
+                  if (k + 1) == len(instance['Tags']) : print_value('NO name')
+         if default_run or i_id : print_value(instance['InstanceId'])
+         if default_run or i_ip : print_value(instance['PrivateIpAddress'])
+         if default_run or i_pip : print_value(instance['PublicIpAddress'])
+         if eol is None :
+            if default_run or param_count > 1 : 
+               print('', end='\n')
+               print('-------------------------------------------------------------')
+         else :
+            print('', end=eol)
 
 #Print Function for tags
 def print_tags(tags_response) :
